@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+	<title>Chap2 Demo Tessellation </title>
+	<script id="vertex-shader" type="x-shader/x-vertex">
+	#version 300 es
+	in vec4 vPosition;
+	void main(){
+		gl_Position = vPosition;
+	}
+	</script>
+
+	<script id="fragment-shader" type="x-shader/x-fragment">
+	#version 300 es
+	precision mediump float;
+	out vec4 fColor;
+	void main(){
+		fColor = vec4( 1.0, 0.0, 0.0, 1.0 );
+	}
+	</script>
+	<link rel="stylesheet" type="text/css" href="css/button.css">
+	<script type="text/javascript" src=" common/webgl-utils.js"></script>
+	<script type="text/javascript" src=" common/initShaders.js"></script>
+	<script type="text/javascript" src=" common/gl-matrix-min.js"></script>
+	<script src="common/jquery-3.7.1.min.js"></script>
+	<script type="text/javascript" src=" js/triangle-tessa.js"></script>
+	<style>
+		#main-container {
+			display: flex;
+			justify-content: center;
+			align-items: center;
+		}
+	</style>
+</head>
+
+<body>
+	<div id="head-container">
+		<h2 style="display: inline-block;">Triangle Tessellation</h2>
+		<button style="margin: 30px;"><a href="index.html">go back</a></button>
+	</div>
+	<div id="main-container">
+
+		<div id="canvas-container">
+			<canvas id="gl-canvas" width="600" height="600">你的浏览器不支持HTML5 canvas元素</canvas>
+		</div>
+
+		<div id="slider-container" style="display: inline-block;">
+			<div id="subdivision-container" style="margin-left: 20px;margin-bottom: 20px; ">
+				<label for="subdivision-slider">Subdivision Levels (0-7):</label>
+				<input type="range" id="subdivision-slider" min="0" max="7" value="3">
+				<span id="subdivision-value">3</span>
+			</div>
+
+			<div id="theta-container" style="margin-left: 20px;margin-bottom: 20px;">
+				<label for="theta-slider">Rotation Angle (0-360):</label>
+				<input type="range" id="theta-slider" min="0" max="360" value="0">
+				<span id="theta-value">0</span>
+			</div>
+
+			<div id="twist-container" style="margin-left: 20px; ">
+				<label for="twist-checkbox">Twist:</label>
+				<input type="checkbox" id="twist-checkbox" style="width: 20px;height: 20px;">
+			</div>
+		</div>
+	</div>
+
+
+</body>
+
+</html>
