@@ -4,6 +4,11 @@
 <head>
 	<meta http-equiv="Content-Type" content="text/html;charset=utf-8">
 	<title>Chap3 Demo -- Continue Dot Square using Mouse Down</title>
+	<style>
+		* {
+			color: #fff;
+		}
+	</style>
 	<script id="vertex-shader" type="x-shader/x-vertex">
 	#version 300 es
 	
@@ -39,10 +44,15 @@
 	<script type="text/javascript" src="common/gl-matrix-min.js"></script>
 
 	<script type="text/javascript" src="js/drawsquaredotcont.js"></script>
+	<link rel="stylesheet" type="text/css" href="css/button.css">
 </head>
 
 <body onload="initSquare()">
-	<h1>Continue Dot Squares using Mouse Down</h1>
+	<div id="head-container">
+		<h1>Continue Dot Squares using Mouse Down</h1>
+		<button style="margin: 30px;"><a href="index.html">go back</a></button>
+	</div>
+
 	<canvas id="dot-canvas" width="512" height="512">你的浏览器不支持HTML5 canvas元素
 	</canvas>
 </body>
