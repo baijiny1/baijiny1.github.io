@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+  body {
+    margin: 0;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    font-family: Arial, sans-serif;
+  }
+  #square {
+    width: 100px;
+    height: 100px;
+    background-color: lightblue;
+    position: absolute;
+  }
+  button {
+    margin: 5px;
+  }
+  .control-panel {
+    display: flex;
+    justify-content: space-around;
+    width: 100%;
+    margin-bottom: 10px;
+  }
+</style>
+</head>
+<body>
+  <div class="control-panel">
+    <label for="dx">X方向:</label>
+    <input type="number" id="x" step="1">
+    <label for="dy">Y方向:</label>
+    <input type="number" id="y" step="1">
+    <button onclick="moveSquare()">平移</button>
+  </div>
+  <div id="square" style="left: 0px; top: 0px;"></div>
+  
+  <script src="../js/b.js"></script>
+</body>
+</html>

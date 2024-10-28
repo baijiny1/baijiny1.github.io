@@ -2,9 +2,9 @@
 <html>
 
 <head>
-    <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
-    <title>Chap3 Demo -- Continue Dot Square using Mouse Down</title>
-    <script id="vertex-shader" type="x-shader/x-vertex">
+	<meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+	<title>Chap3 Demo -- Continue Dot Square using Mouse Down</title>
+	<script id="vertex-shader" type="x-shader/x-vertex">
 	#version 300 es
 	
 	in vec4 vPosition;
@@ -20,7 +20,7 @@
 	}
 	</script>
 
-    <script id="fragment-shader" type="x-shader/x-fragment">
+	<script id="fragment-shader" type="x-shader/x-fragment">
 	#version 300 es
 	
 	precision mediump float;
@@ -34,17 +34,17 @@
 	}
 	</script>
 
-    <script type="text/javascript" src="../js/common/webgl-utils.js"></script>
-    <script type="text/javascript" src="../js/common/initShaders.js"></script>
-    <script type="text/javascript" src="../js/common/gl-matrix-min.js"></script>
+	<script type="text/javascript" src="common/webgl-utils.js"></script>
+	<script type="text/javascript" src="common/initShaders.js"></script>
+	<script type="text/javascript" src="common/gl-matrix-min.js"></script>
 
-    <script type="text/javascript" src="../js/ch03/drawsquaredotcont.js"></script>
+	<script type="text/javascript" src="js/drawsquaredotcont.js"></script>
 </head>
 
 <body onload="initSquare()">
-    <h1>Continue Dot Squares using Mouse Down</h1>
-    <canvas id="dot-canvas" width="512" height="512">你的浏览器不支持HTML5 canvas元素
-    </canvas>
+	<h1>Continue Dot Squares using Mouse Down</h1>
+	<canvas id="dot-canvas" width="512" height="512">你的浏览器不支持HTML5 canvas元素
+	</canvas>
 </body>
 
 </html>

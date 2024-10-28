@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+  body {
+    margin: 0;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background-color: ghostwhite;
+    font-family: Arial, sans-serif;
+  }
+  canvas {
+    border: 0px solid white;
+  }
+</style>
+</head>
+<body>
+  <label for="xPos">X:</label>
+  <input type="number" id="x">
+  <label for="yPos">Y:</label>
+  <input type="number" id="y">
+  <label for="size">Size:</label>
+  <input type="number" id="size">
+  <button onclick="drawSquare()">绘制正方形</button>
+  <canvas id="myCanvas" width="800" height="700"></canvas>
+  
+  <script src="../js/a.js"></script>
+</body>
+</html>

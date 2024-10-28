@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Square Rotation</title>
+<style>
+  #square {
+    width: 200px;
+    height: 200px;
+    background-color: skyblue;
+    position: absolute;
+    top: 150px;
+    left: 50px;
+    transform-origin: center;
+  }
+</style>
+</head>
+<body>
+
+<div id="square"></div>
+
+<label for="xSlider">X轴: </label>
+<input type="range" id="xSlider" min="0" max="360" value="0" oninput="rotateX(this.value)">
+<p></p>
+<label for="ySlider">Y轴: </label>
+<input type="range" id="ySlider" min="0" max="360" value="0" oninput="rotateY(this.value)">
+<script src="../js/c.js"></script>
+</body>
+</html>
