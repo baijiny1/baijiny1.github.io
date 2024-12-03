@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta http-equiv="Content-type" content="text/html;charset=utf-8">
+    <title>环境映射几何体</title>
+    <script id="vertex-shader" type="x-shader/x-vertex">
+#version 300 es
+out vec3 R;
+
+in vec4 vPosition;
+in vec4 vNormal;
+
+uniform mat4 modelViewMatrix;
+uniform mat4 projectionMatrix;
+uniform mat3 normalMatrix;
+
+void main()
+{
+    gl_Position = projectionMatrix * modelViewMatrix * vPosition;
+    vec3 eyePos = (modelViewMatrix * vPosition).xyz;
+    vec3 N = normalize(normalMatrix * vNormal.xyz);
+    R = reflect(eyePos, N);
+}
+    </script>
+
+    <script id="fragment-shader" type="x-shader/x-fragment">
+#version 300 es
+precision mediump float;
+
+in vec3 R;
+uniform samplerCube texMap;
+
+out vec4 fColor;
+
+void main()
+{
+    vec4 texColor = texture(texMap, R);
+    fColor = texColor;
+}
+    </script>
+    <link rel="stylesheet" type="text/css" href="css/button.css">
+    <script type="text/javascript" src="common/webgl-utils.js"></script>
+    <script type="text/javascript" src="common/initShaders.js"></script>
+    <script type="text/javascript" src="common/gl-matrix-min.js"></script>
+</head>
+
+<body>
+    <h1>环境映射几何体</h1>
+
+    <canvas id="gl-canvas" width="600" height="400">
+        你的浏览器不支持HTML5 canvas元素
+    </canvas>
+
+    <input type="file" id="textureInput" accept="image/*">
+    <canvas id="textureCanvas" width="100" height="100"></canvas>
+    <button style="margin: 30px;"><a href="index.html">go back</a></button>
+    <script type="text/javascript">
+        // 获取canvas元素和WebGL上下文
+        const canvas = document.getElementById('gl-canvas');
+        const gl = canvas.getContext('webgl');
+
+        // 初始化着色器程序
+        const program = initShaderProgram(gl, document.getElementById('vertex-shader').text, document.getElementById('fragment-shader').text);
+        gl.useProgram(program);
+
+        // 设置几何体的顶点数据和索引
+        // ...（省略几何体顶点数据和索引的设置）
+
+        // 加载纹理
+        function loadTexture(gl, textureInput, textureCanvas) {
+            const file = textureInput.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function (event) {
+                    const img = new Image();
+                    img.onload = function () {
+                        const texture = gl.createTexture();
+                        gl.bindTexture(gl.TEXTURE_CUBE_MAP, texture);
+                        const cubeMapFaces = [
+                            gl.TEXTURE_CUBE_MAP_POSITIVE_X, gl.TEXTURE_CUBE_MAP_NEGATIVE_X,
+                            gl.TEXTURE_CUBE_MAP_POSITIVE_Y, gl.TEXTURE_CUBE_MAP_NEGATIVE_Y,
+                            gl.TEXTURE_CUBE_MAP_POSITIVE_Z, gl.TEXTURE_CUBE_MAP_NEGATIVE_Z
+                        ];
+                        cubeMapFaces.forEach(face => {
+                            gl.texImage2D(face, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, img);
+                        });
+                        gl.generateMipmap(gl.TEXTURE_CUBE_MAP);
+                        gl.bindTexture(gl.TEXTURE_CUBE_MAP, null);
+                        return texture;
+                    };
+                    img.src = event.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        // 监听纹理文件输入
+        document.getElementById('textureInput').addEventListener('change', function () {
+            const texture = loadTexture(gl, this, document.getElementById('textureCanvas'));
+            // 更新天空盒纹理
+            updateSkyboxTexture(gl, texture);
+        });
+
+        // 更新天空盒纹理
+        function updateSkyboxTexture(gl, texture) {
+            const texMap = gl.getUniformLocation(program, 'texMap');
+            gl.uniform1i(texMap, 0); // 纹理单元0
+            // 设置纹理到WebGL
+            gl.activeTexture(gl.TEXTURE0);
+            gl.bindTexture(gl.TEXTURE_CUBE_MAP, texture);
+        }
+
+        // 渲染循环
+        function render() {
+            // 清除颜色缓冲区
+            gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+            // 绘制几何体
+            // ...（省略绘制代码）
+            requestAnimationFrame(render);
+        }
+
+        // 开始渲染循环
+        requestAnimationFrame(render);
+    </script>
+
+    <button id="ButtonX">Rotate X</button>
+    <button id="ButtonY">Rotate Y</button>
+    <button id="ButtonZ">Rotate Z</button>
+    <button id="ButtonT">Toggle Rotation</button>
+</body>
+
+</html>

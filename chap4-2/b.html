@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title></title>
+  <style>
+    #cube {
+      width: 100px;
+      height: 100px;
+      position: relative;
+      margin: 50px;
+      transform-style: preserve-3d;
+      animation: spin 20s infinite linear;
+    }
+
+    .face {
+      position: absolute;
+      width: 100px;
+      height: 100px;
+      background: rgba(200, 200, 200, 0.9);
+      border: 1px solid #ccc;
+    }
+
+    .slider-container {
+      margin: 20px;
+    }
+
+    .slider-label {
+      display: block;
+      margin-bottom: 5px;
+    }
+  </style>
+  <link rel="stylesheet" type="text/css" href="css/button.css">
+</head>
+
+<body>
+  <button style="margin: 30px;"><a href="index.html">go back</a></button>
+  <div id="cube">
+    <div class="face" style="transform: translateZ(50px);">Front</div>
+    <div class="face" style="transform: rotateY(90deg) translateZ(50px);">Right</div>
+    <div class="face" style="transform: rotateY(-90deg) translateZ(50px);">Left</div>
+    <div class="face" style="transform: rotateX(90deg) translateZ(50px); background: rgba(200, 0, 0, 0.9);">Top</div>
+    <div class="face" style="transform: rotateX(-90deg) translateZ(50px); background: rgba(0, 200, 0, 0.9);">Bottom
+    </div>
+    <div class="face" style="transform: rotateY(180deg) translateZ(50px); background: rgba(0, 0, 100, 0.9);">right</div>
+  </div>
+
+  <!-- 滑动按钮容器 -->
+  <div class="slider-container">
+    <label class="slider-label" for="x-slider">Move X: </label>
+    <input type="range" id="x-slider" min="-200" max="200" value="0">
+  </div>
+
+  <div class="slider-container">
+    <label class="slider-label" for="y-slider">Move Y: </label>
+    <input type="range" id="y-slider" min="-200" max="200" value="0">
+  </div>
+
+  <script src="js/1.js"></script>
+</body>
+
+</html>

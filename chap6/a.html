@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recursive Tetrahedron to Sphere</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+        }
+
+        canvas {
+            display: block;
+        }
+    </style>
+    <link rel="stylesheet" type="text/css" href="css/button.css">
+</head>
+
+<body>
+    <button style="margin: 30px;"><a href="index.html">go back</a></button>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script>
+        // Set up the scene, camera, and renderer
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(renderer.domElement);
+
+        // Define the vertices of a regular tetrahedron (unit sphere centered at origin)
+        const vertices = [
+            new THREE.Vector3(1, 1, 1).normalize(),
+            new THREE.Vector3(1, -1, -1).normalize(),
+            new THREE.Vector3(-1, 1, -1).normalize(),
+            new THREE.Vector3(-1, -1, 1).normalize()
+        ];
+
+        // Define the faces of the tetrahedron using vertex indices
+        const faces = [
+            [0, 1, 2],
+            [0, 1, 3],
+            [0, 2, 3],
+            [1, 2, 3]
+        ];
+
+        // Function to divide a triangle into 4 smaller triangles (recursive)
+        function divideTriangle(a, b, c, level) {
+            if (level === 0) {
+                return [
+                    { a: a, b: b, c: c }
+                ];
+            }
+
+            // Calculate midpoints of the edges
+            const ab = a.clone().lerp(b, 0.5).normalize();
+            const bc = b.clone().lerp(c, 0.5).normalize();
+            const ca = c.clone().lerp(a, 0.5).normalize();
+
+            // Recursively divide smaller triangles
+            return [
+                ...divideTriangle(a, ab, ca, level - 1),
+                ...divideTriangle(b, bc, ab, level - 1),
+                ...divideTriangle(c, ca, bc, level - 1),
+                ...divideTriangle(ab, bc, ca, level - 1)
+            ];
+        }
+
+        // Create a BufferGeometry and populate with vertices and faces
+        const geometry = new THREE.BufferGeometry();
+        const positions = [];
+        const indices = [];
+
+        faces.forEach(face => {
+            const a = vertices[face[0]];
+            const b = vertices[face[1]];
+            const c = vertices[face[2]];
+
+            // Subdivide the triangle
+            const newFaces = divideTriangle(a, b, c, 3);  // 3 levels of recursion
+
+            newFaces.forEach(f => {
+                // Push vertices to the positions array
+                positions.push(f.a.x, f.a.y, f.a.z);
+                positions.push(f.b.x, f.b.y, f.b.z);
+                positions.push(f.c.x, f.c.y, f.c.z);
+            });
+        });
+
+        // Convert positions array to a Float32Array and set it as the geometry's attribute
+        geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+
+        // Create the mesh and add to the scene
+        const material = new THREE.MeshBasicMaterial({ color: 0xFFC0CB, wireframe: true }); // Changed color to pink
+        const mesh = new THREE.Mesh(geometry, material);
+        scene.add(mesh);
+
+        // Set up the camera
+        camera.position.z = 3;
+
+        // Render loop
+        function animate() {
+            requestAnimationFrame(animate);
+            mesh.rotation.x += 0.01;
+            mesh.rotation.y += 0.01;
+            renderer.render(scene, camera);
+        }
+
+        animate();
+    </script>
+</body>
+
+</html>

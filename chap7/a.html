@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recursive Tetrahedron to Sphere with Checkerboard Texture</title>
+    <style>
+        body { margin: 0; overflow: hidden; }
+        canvas { display: block; }
+    </style>
+</head>
+<body>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script> 
+    <script>
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(renderer.domElement);
+
+        const checkerboardCanvas = document.createElement('canvas');
+        checkerboardCanvas.width = 256;
+        checkerboardCanvas.height = 256;
+        const ctx = checkerboardCanvas.getContext('2d');
+        const scale = 8; 
+        for (let i = 0; i < scale; i++) {
+            for (let j = 0; j < scale; j++) {
+                ctx.fillStyle = (i + j) % 2 === 0 ? '#fff' : '#000';
+                ctx.fillRect(i * 32, j * 32, 32, 32);
+            }
+        }
+        const checkerboardTexture = new THREE.CanvasTexture(checkerboardCanvas);
+
+        const geometry = new THREE.SphereGeometry(1, 32, 32);
+        const material = new THREE.MeshBasicMaterial({ map: checkerboardTexture });
+        const sphere = new THREE.Mesh(geometry, material);
+        scene.add(sphere);
+
+        camera.position.z = 3;
+
+        function animate() {
+            requestAnimationFrame(animate);
+            sphere.rotation.x += 0.01;
+            sphere.rotation.y += 0.01;
+            renderer.render(scene, camera);
+        }
+
+        animate();
+    </script>
+</body>
+</html>
