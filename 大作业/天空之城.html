@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sky City with Three.js</title>
+    <style>
+        body { margin: 0; overflow: hidden; }
+        canvas { display: block; }
+        button { position: fixed; top: 10px; margin-left: 10px; }
+        #addCloud { left: 10px; }
+        #changeBackground { left: 130px; }
+        #changeLight { left: 250px; }
+        #lightIntensity { position: fixed; top: 50px; left: 10px; width: 300px; }
+        #backgroundColor { position: fixed; top: 90px; left: 10px; }
+        #zoomControl { position: fixed; top: 130px; left: 10px; width: 300px; }
+        #rotateControl { position: fixed; top: 170px; left: 10px; width: 300px; }
+    </style>
+</head>
+<body>
+<button id="addCloud">增加云朵</button>
+<button id="changeBackground">改变背景颜色</button>
+<button id="changeLight">改变光照颜色</button>
+<input type="range" id="lightIntensity" min="0" max="5" step="0.01" value="0.8">
+<input type="color" id="backgroundColor" value="#87CEEB">
+<input type="range" id="zoomControl" min="50" max="500" step="1" value="150">
+<input type="range" id="rotateControl" min="0" max="360" step="1" value="0">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>        
+<script>
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+const renderer = new THREE.WebGLRenderer();
+renderer.setSize(window.innerWidth, window.innerHeight);
+document.body.appendChild(renderer.domElement);
+
+// 设置天空背景色
+const skyColor = 0x87CEEB; // 浅蓝色
+renderer.setClearColor(new THREE.Color(skyColor));
+
+// 灯光设置
+const ambientLight = new THREE.AmbientLight(0xFFFFFF, 0.5);
+scene.add(ambientLight);
+const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+directionalLight.position.set(0, 20, 10);
+scene.add(directionalLight);
+
+camera.position.z = 150;
+
+// 创建岛屿和城堡的函数
+function createIsland(x, y, z, radius, height) {
+    const islandGeometry = new THREE.CylinderGeometry(radius, radius, height, 32);
+    const islandMaterial = new THREE.MeshStandardMaterial({ color: 0x8bc34a });
+    const island = new THREE.Mesh(islandGeometry, islandMaterial);
+    island.position.set(x, y, z);
+    // 在岛屿上添加树木
+    for (let i = 0; i < 5; i++) {
+        const treeGeometry = new THREE.ConeGeometry(1, 5, 4);
+        const treeMaterial = new THREE.MeshStandardMaterial({ color: 0x006400 });
+        const tree = new THREE.Mesh(treeGeometry, treeMaterial);
+        tree.position.set(Math.random() * (radius * 2) - radius, height / 2, Math.random() * (radius * 2) - radius);
+        island.add(tree);
+    }
+    // 在岛屿中心添加城堡
+    const castle = createCastle();
+    castle.position.set(x, height / 2, z);
+    island.add(castle);
+    // 添加花朵
+    for (let i = 0; i < 10; i++) {
+        const flower = createFlower();
+        flower.position.set(Math.random() * (radius * 2) - radius, height / 2, Math.random() * (radius * 2) - radius);
+        island.add(flower);
+    }
+    // 添加鸟类
+    for (let i = 0; i < 3; i++) {
+        const bird = createBird();
+        bird.position.set(Math.random() * (radius * 2) - radius, height / 2 + 3, Math.random() * (radius * 2) - radius);
+        island.add(bird);
+    }
+    return island;
+}
+
+// 创建一个简单的城堡
+function createCastle() {
+    const castleGroup = new THREE.Group();
+    // 创建主塔（圆柱体）
+    const towerGeometry = new THREE.CylinderGeometry(5, 5, 20, 32);
+    const towerMaterial = new THREE.MeshStandardMaterial({ color: 0xFFC0CB });
+    const tower = new THREE.Mesh(towerGeometry, towerMaterial);
+    tower.position.set(0, 10, 0);
+    castleGroup.add(tower);
+    // 创建塔的屋顶（圆锥体）
+    const roofGeometry = new THREE.ConeGeometry(6, 8, 4);
+    const roofMaterial = new THREE.MeshStandardMaterial({ color: 0xFFC0CB });
+    const roof = new THREE.Mesh(roofGeometry, roofMaterial);
+    roof.position.set(0, 20, 0);
+    castleGroup.add(roof);
+    // 创建城堡墙壁（立方体）
+    const wallGeometry = new THREE.BoxGeometry(12, 6, 2);
+    const wallMaterial = new THREE.MeshStandardMaterial({ color: 0xFFC0CB });
+    const wall1 = new THREE.Mesh(wallGeometry, wallMaterial);
+    wall1.position.set(0, 5, 7);
+    castleGroup.add(wall1);
+    return castleGroup;
+}
+
+// 创建可以上下移动的云朵
+function createCloud(x, y, z, size) {
+    const cloudGeometry = new THREE.SphereGeometry(size, 32, 32);
+    const cloudMaterial = new THREE.MeshStandardMaterial({ color: 0xffffff, transparent: true });
+    const cloud = new THREE.Mesh(cloudGeometry, cloudMaterial);
+    cloud.position.set(x, y, z);
+    cloud.userData.speed = Math.random() * 0.01 + 0.01; // 云朵的移动速度
+    return cloud;
+}
+
+// 创建一个简单的花朵，颜色随机
+function createFlower() {
+    const petalGeometry = new THREE.CircleGeometry(2, 32);
+    const petalMaterial = new THREE.MeshStandardMaterial({ color: Math.random() * 0xffffff });
+    const petal = new THREE.Mesh(petalGeometry, petalMaterial);
+    petal.rotation.x = Math.PI / 2;
+    const stemGeometry = new THREE.CylinderGeometry(0.1, 0.1, 4, 8);
+    const stemMaterial = new THREE.MeshStandardMaterial({ color: 0x228B22 });
+    const stem = new THREE.Mesh(stemGeometry, stemMaterial);
+    stem.position.y = -2;
+    const flower = new THREE.Group();
+    flower.add(petal);
+    flower.add(stem);
+    return flower;
+}
+
+// 创建一个简单的鸟（黄色球体加翅膀）
+function createBird() {
+    const birdGroup = new THREE.Group();
+    // 鸟的身体（黄色球体）
+    const bodyGeometry = new THREE.SphereGeometry(2, 16, 16);
+    const bodyMaterial = new THREE.MeshStandardMaterial({ color: 0xFFFF00 });
+    const body = new THREE.Mesh(bodyGeometry, bodyMaterial);
+    birdGroup.add(body);
+    // 鸟的翅膀（小圆锥体）
+    const wingGeometry = new THREE.ConeGeometry(1, 3, 4);
+    const wingMaterial = new THREE.MeshStandardMaterial({ color: 0xFFD700 });
+    const leftWing = new THREE.Mesh(wingGeometry, wingMaterial);
+    const rightWing = new THREE.Mesh(wingGeometry, wingMaterial);
+    leftWing.position.set(-1.5, 0, 0);
+    rightWing.position.set(1.5, 0, 0);
+    birdGroup.add(leftWing);
+    birdGroup.add(rightWing);
+    return birdGroup;
+}
+
+// 添加岛屿
+const numIslands = 20;
+for (let i = 0; i < numIslands; i++) {
+    scene.add(createIsland(Math.random() * 200 - 100, 0, Math.random() * 200 - 100, 5 + Math.random() * 10, 10 + Math.random() * 20));
+}
+
+// 添加云朵
+const clouds = [];
+const numClouds = 30;
+for (let i = 0; i < numClouds; i++) {
+    const cloud = createCloud(Math.random() * 400 - 200, 20 + Math.random() * 30, Math.random() * 400 - 200, 5 + Math.random() * 10);
+    scene.add(cloud);
+    clouds.push(cloud);
+}
+
+// 获取按钮元素
+const addCloudButton = document.getElementById('addCloud');
+const changeBackgroundButton = document.getElementById('changeBackground');
+const changeLightButton = document.getElementById('changeLight');
+const lightIntensityRange = document.getElementById('lightIntensity');
+const backgroundColorPicker = document.getElementById('backgroundColor');
+const zoomControl = document.getElementById('zoomControl');
+const rotateControl = document.getElementById('rotateControl');
+
+// 为增加云朵按钮添加点击事件监听器
+addCloudButton.addEventListener('click', function() {
+    const cloud = createCloud(Math.random() * 400 - 200, 20 + Math.random() * 30, Math.random() * 400 - 200, 5 + Math.random() * 10);
+    scene.add(cloud);
+    clouds.push(cloud);
+});
+
+// 为改变背景颜色按钮添加点击事件监听器
+changeBackgroundButton.addEventListener('click', function() {
+    const newColor = backgroundColorPicker.value; // 使用取色器选择的颜色
+    renderer.setClearColor(new THREE.Color(newColor));
+});
+
+// 为改变光照颜色按钮添加点击事件监听器
+changeLightButton.addEventListener('click', function() {
+    // 改变环境光颜色和强度
+    ambientLight.color.setHex(Math.random() * 0xffffff);
+    directionalLight.color.setHex(Math.random() * 0xffffff);
+});
+
+// 为光照强度滑杆添加事件监听器
+lightIntensityRange.addEventListener('input', function() {
+    ambientLight.intensity = parseFloat(this.value);
+    directionalLight.intensity = parseFloat(this.value);
+});
+
+// 为缩放滑杆添加事件监听器
+zoomControl.addEventListener('input', function() {
+    camera.position.z = parseFloat(this.value);
+});
+
+// 为旋转滑杆添加事件监听器
+rotateControl.addEventListener('input', function() {
+    camera.rotation.y = parseFloat(this.value) * Math.PI / 180;
+});
+
+function animate() {
+    requestAnimationFrame(animate);
+    clouds.forEach(cloud => {
+        cloud.position.y += cloud.userData.speed;
+        if (cloud.position.y > 30 || cloud.position.y < 10) {
+            cloud.position.y = 10;
+            cloud.userData.speed *= -1;
+        }
+    });
+    renderer.render(scene, camera);
+}
+animate();
+</script>
+</body>
+</html>
